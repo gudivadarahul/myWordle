@@ -1,39 +1,58 @@
-import { describe, expect, it } from 'vitest'
-import App from './App'
-import { useStore } from './store'
-import { render, screen, userEvent } from './test/test-utils'
+import { describe, expect, test } from 'vitest';
+import App from './App';
+import { useStore } from './store';
+import { render, screen, userEvent, within } from './test/test-utils';
 
 describe('App', () => {
-  it('the title is visible', () => {
-    render(<App />)
-    expect(screen.getByText(/Rahul's Wordle/i)).toBeInTheDocument()
-  })
+  test('the title is visible', () => {
+    render(<App />);
+    expect(screen.getByText('Rahul\'s Wordle')).toBeInTheDocument();
+  });
 
-  it('shows empty state', () => {
-    useStore.setState({ guesses: []})
-    render(<App />)
-    expect(screen.queryByText("Game Over")).toBeNull();
+  test('shows empty state', () => {
+    useStore.getState().newGame([]);
+    render(<App />);
+    expect(screen.queryByText('Game Over')).toBeNull();
     expect(document.querySelectorAll('main div')).toHaveLength(6);
     expect(document.querySelector('main')?.textContent).toEqual('');
-  })
+  });
 
-  it('it shows one row of guesses', () => {
-    useStore.setState({ guesses: ['hello']})
-    render(<App />)
+  test('shows one row of guesses', () => {
+    useStore.getState().newGame(['hello']);
+    render(<App />);
     expect(document.querySelector('main')?.textContent).toEqual('hello');
-  })
+  });
 
-  it('show lost game state', () => {
-    useStore.setState({ guesses: Array(6).fill('hello')})
-    render(<App />)
-    expect(screen.getByText("Game Over!")).toBeInTheDocument();
-  })
-  
-  it('can start a new game', () => {
-    useStore.setState({ guesses: Array(6).fill('hello')})
-    render(<App />)
-    expect(screen.getByText("Game Over!")).toBeInTheDocument();
-    userEvent.click(screen.getByText('New Game'))
+  test('shows lost game state', () => {
+    useStore.getState().newGame(Array(6).fill('hello'));
+    render(<App />);
+    expect(screen.getByText(/Game Over/i)).toBeInTheDocument();
+  });
+
+  test('show won game state', () => {
+    const initialState = Array(2).fill('hello');
+    useStore.getState().newGame(initialState);
+    const answer = useStore.getState().answer;
+    useStore.getState().addGuess(answer);
+
+    render(<App />);
+
+    // shows all guesses in the DOM
+    expect(document.querySelector('main')?.textContent).toEqual(
+      initialState.join('') + answer
+    );
+    expect(screen.getByText(/Game Over/i)).toBeInTheDocument();
+  });
+
+  test('can start new game', () => {
+    useStore.getState().newGame(Array(6).fill(''));
+    render(<App />);
+    expect(screen.getByText(/Game Over/i)).toBeInTheDocument();
+
+    userEvent.click(
+      within(screen.getByRole('modal')).getByText('New Game', {})
+    );
     expect(document.querySelector('main')?.textContent).toEqual('');
-  })
-})
+    expect(screen.queryByText('Game Over')).toBeNull();
+  });
+});

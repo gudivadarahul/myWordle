@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { useStore } from './store'
+import { useStore, GUESS_LEN } from './store'
 import { letter_length } from './word-utils'
 import WordRow from './WordRow'
 
-const GUESS_LEN = 6
+
 
 
 function App() {
@@ -33,7 +33,7 @@ function App() {
 
   rows = rows.concat(...Array(numberOfGuessesLeft).fill(''))
 
-  const isGameOver = state.rows.length === GUESS_LEN
+  const isGameOver = state.gameState !== 'playing'
 
   return (
     <div className='mx-auto w-96 relative'>
