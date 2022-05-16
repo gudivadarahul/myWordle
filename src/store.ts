@@ -6,6 +6,7 @@ interface StoreState {
     answer: string;
     guesses: string[];
     addGuess: (guess: string) => void;
+    newGame: () => void
 }
 
 export const useStore = create<StoreState>()(
@@ -18,6 +19,12 @@ export const useStore = create<StoreState>()(
                     guesses: [...state.guesses, guess]
                 }));
             },
+            newGame: () => {
+                set({
+                    answer: getRandomWord(),
+                    guesses: []
+                })
+            }
         }),
         {
             name: 'Rahul\'s Wordle'
