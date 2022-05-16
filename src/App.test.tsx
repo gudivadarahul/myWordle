@@ -28,7 +28,7 @@ describe('App', () => {
     render(<App />)
     expect(screen.getByText("Game Over!")).toBeInTheDocument();
   })
-
+  
   it('can start a new game', () => {
     useStore.setState({ guesses: Array(6).fill('hello')})
     render(<App />)
