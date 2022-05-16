@@ -6,7 +6,6 @@ import WordRow from './WordRow'
 const GUESS_LEN = 6
 
 
-
 function App() {
 
   const state = useStore()
@@ -24,17 +23,17 @@ function App() {
     setGuess(newGuess)
   }
 
-  let rows = [...state.guesses]
+  let rows = [...state.rows]
 
   if(rows.length < GUESS_LEN) {
-    rows.push(guess)
+    rows.push({guess})
   }
 
   const numberOfGuessesLeft = GUESS_LEN - rows.length
 
   rows = rows.concat(...Array(numberOfGuessesLeft).fill(''))
 
-  const isGameOver = state.guesses.length === GUESS_LEN
+  const isGameOver = state.rows.length === GUESS_LEN
 
   return (
     <div className='mx-auto w-96 relative'>
@@ -47,8 +46,8 @@ function App() {
       </header>
 
       <main className='grid grid-rows-6 gap-4'>
-        {rows.map((word, index) => (
-          <WordRow key={index} letters={word} />
+        {rows.map(({guess, result}, index) => (
+          <WordRow key={index} letters={guess} result={result}/>
         ))}
       </main>
 
